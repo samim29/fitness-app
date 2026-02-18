@@ -3,12 +3,36 @@ const Workout = require("../models/Workout");
 const addWorkout = async (req, res) => {
   try {
     const { date, distance, duration, intensity } = req.body;
-    if (!date || !distance || !duration) {
-      return res.status(400).json({ message: "All fields required" });
+
+    // Future date validation
+    if (new Date(date) > new Date()) {
+      return res.status(400).json({
+        message: "Workout date cannot be in the future",
+      });
     }
 
-    // simple calorie formula
-    const calories = distance * 60;
+    // Distance validation (allow decimals)
+    if (!distance || distance <= 0) {
+      return res.status(400).json({
+        message: "Distance must be a positive number",
+      });
+    }
+
+    // Duration validation (integer only)
+    if (!Number.isInteger(Number(duration)) || duration <= 0) {
+      return res.status(400).json({
+        message: "Duration must be a positive integer",
+      });
+    }
+
+    // Calories logic based on intensity
+    let caloriesPerKm = 60;
+
+    if (intensity === "low") caloriesPerKm = 50;
+    if (intensity === "medium") caloriesPerKm = 60;
+    if (intensity === "high") caloriesPerKm = 75;
+
+    const calories = distance * caloriesPerKm;
 
     const workout = await Workout.create({
       user: req.user.id,
@@ -24,6 +48,7 @@ const addWorkout = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 const getWorkouts = async (req, res) => {
   try {
