@@ -184,277 +184,339 @@ function Dashboard() {
     }
     return null;
   };
-
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="max-w-5xl mx-auto px-6 py-8">
-        {/* ================= STATS ================= */}
-        {goalData && (
-          <div className="grid md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white p-6 rounded-xl shadow text-center">
-              <p className="text-gray-500 text-sm">Workout Sessions</p>
-              <h3 className="text-2xl font-bold mt-2">
-                {goalData.totalWorkouts}
-              </h3>
-            </div>
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar */}
+      <div className="w-64 bg-white shadow-md p-6">
+        <h2 className="text-xl font-bold mb-6">FitTrack</h2>
 
-            <div className="bg-white p-6 rounded-xl shadow text-center">
-              <p className="text-gray-500 text-sm">Distance This Week</p>
-              <h3 className="text-2xl font-bold mt-2">
-                {goalData.totalDistance.toFixed(1)} km
-              </h3>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow text-center">
-              <p className="text-gray-500 text-sm">Calories Burned</p>
-              <h3 className="text-2xl font-bold mt-2">
-                {Math.round(goalData.totalCalories).toLocaleString()} kcal
-              </h3>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow text-center">
-              <p className="text-gray-500 text-sm">Avg Pace</p>
-              <h3 className="text-2xl font-bold mt-2">
-                {formatPace(goalData.averagePace)}
-              </h3>
-            </div>
-          </div>
-        )}
-        {/* ================= CHART ================= */}
-        {goalData && (
-          <div className="bg-white p-6 rounded-xl shadow mb-8">
-            <h2 className="text-lg font-semibold mb-6">
-              Weekly Distance Trend
-            </h2>
-
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={getChartData()}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="day" />
-                <YAxis />
-                <Tooltip content={<CustomTooltip />} />
-
-                <Line
-                  type="monotone"
-                  dataKey="distance"
-                  stroke="#3B82F6"
-                  strokeWidth={3}
-                  dot={{ r: 5 }}
-                  activeDot={{ r: 7 }}
-                  animationDuration={800}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-
-        {/* ================= GOAL ================= */}
-        {goalData ? (
-          <div className="bg-white p-6 rounded-xl shadow mb-8">
-            <h2 className="text-lg font-semibold mb-4">Weekly Goal Progress</h2>
-
-            <p>Target: {goalData.goal.targetDistance} km</p>
-            <p>Completed: {goalData.totalDistance.toFixed(1)} km</p>
-            <p>
-              Remaining:{" "}
-              {Math.max(
-                goalData.goal.targetDistance - goalData.totalDistance,
-                0,
-              ).toFixed(1)}{" "}
-              km
-            </p>
-
-            <div className="w-full bg-gray-200 rounded-full h-4 mt-3">
-              <div
-                className="bg-green-500 h-4 rounded-full transition-all"
-                style={{ width: `${goalData.progress}%` }}
-              ></div>
-            </div>
-
-            <p className="mt-2 text-sm text-gray-600">
-              {Math.round(goalData.progress)}% completed
-            </p>
-          </div>
-        ) : (
-          <div className="bg-white p-6 rounded-xl shadow mb-8">
-            <h2 className="text-lg font-semibold mb-4">Set Weekly Goal</h2>
-
-            <form onSubmit={handleSetGoal} className="flex gap-4">
-              <input
-                type="number"
-                min="1"
-                placeholder="Target Distance (km)"
-                value={targetDistance}
-                onChange={(e) => setTargetDistance(e.target.value)}
-                className="border p-2 rounded w-full"
-                required
-              />
-              <button className="bg-green-600 text-white px-4 rounded hover:bg-green-700">
-                Set
-              </button>
-            </form>
-          </div>
-        )}
-
-        {/* ================= ADD WORKOUT ================= */}
-        <div className="bg-white p-6 rounded-xl shadow mb-8">
-          <h2 className="text-lg font-semibold mb-4">Add Workout</h2>
-
-          <form
-            onSubmit={handleAddWorkout}
-            className="grid md:grid-cols-5 gap-4"
+        <nav className="space-y-4">
+          <button className="block text-left w-full text-gray-700 hover:text-blue-600">
+            Dashboard
+          </button>
+          <button className="block text-left w-full text-gray-700 hover:text-blue-600">
+            Profile
+          </button>
+          <button
+            onClick={handleLogout}
+            className="block text-left w-full text-red-500 hover:text-red-600"
           >
-            <input
-              type="date"
-              max={new Date().toISOString().split("T")[0]}
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="border p-2 rounded"
-              required
-            />
-            <input
-              type="number"
-              step="0.1"
-              min="0.1"
-              placeholder="Distance (km)"
-              value={distance}
-              onChange={(e) => setDistance(e.target.value)}
-              className="border p-2 rounded"
-              required
-            />
-            <input
-              type="number"
-              min="1"
-              placeholder="Duration (mins)"
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
-              className="border p-2 rounded"
-              required
-            />
-            <select
-              value={intensity}
-              onChange={(e) => setIntensity(e.target.value)}
-              className="border p-2 rounded"
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-            <button className="bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-              Add
-            </button>
-          </form>
-        </div>
-
-        {/* ================= WORKOUT LIST ================= */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {workouts.map((workout) => (
-            <div
-              key={workout._id}
-              className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition"
-            >
-              <p className="text-sm text-gray-500 mb-2">
-                {new Date(workout.date).toLocaleDateString()}
-              </p>
-
-              <p className="text-lg font-semibold text-gray-800">
-                {workout.distance} km
-              </p>
-
-              <p>Duration: {formatDuration(workout.duration)}</p>
-              <p>
-                Pace:{" "}
-                {formatPace(
-                  calculateWorkoutPace(workout.distance, workout.duration),
-                )}
-              </p>
-              <p>
-                Calories: {Math.round(workout.calories).toLocaleString()} kcal
-              </p>
-              <p>Intensity: {workout.intensity}</p>
-
-              <div className="mt-4 flex gap-3">
-                <button
-                  onClick={() => handleEditClick(workout)}
-                  className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(workout._id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+            Logout
+          </button>
+        </nav>
       </div>
 
-      {/* ================= EDIT MODAL ================= */}
-      {isEditOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl shadow-xl w-96">
-            <h2 className="text-lg font-semibold mb-4">Edit Workout</h2>
+      {/* Main Content */}
+      <div className="flex-1 p-8">
+        <div className="max-w-5xl mx-auto px-6 py-8">
+          {/* ================= STATS ================= */}
+          {goalData && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {/* Distance */}
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow hover:scale-105 transition-transform">
+                <p className="text-sm opacity-80">Distance</p>
+                <h2 className="text-2xl font-bold mt-2">
+                  {goalData.totalDistance.toFixed(1)} km
+                </h2>
+              </div>
 
-            <form onSubmit={handleUpdateWorkout} className="space-y-4">
+              {/* Calories */}
+              <div className="bg-gradient-to-r from-red-500 to-pink-500 text-white p-6 rounded-xl shadow hover:scale-105 transition-transform">
+                <p className="text-sm opacity-80">Calories</p>
+                <h2 className="text-2xl font-bold mt-2">
+                  {Math.round(goalData.totalCalories).toLocaleString()} kcal
+                </h2>
+              </div>
+
+              {/* Sessions */}
+              <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white p-6 rounded-xl shadow hover:scale-105 transition-transform">
+                <p className="text-sm opacity-80">Sessions</p>
+                <h2 className="text-2xl font-bold mt-2">
+                  {goalData.totalWorkouts}
+                </h2>
+              </div>
+
+              {/* Pace */}
+              <div className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white p-6 rounded-xl shadow hover:scale-105 transition-transform">
+                <p className="text-sm opacity-80">Avg Pace</p>
+                <h2 className="text-2xl font-bold mt-2">
+                  {formatPace(goalData.averagePace)}
+                </h2>
+              </div>
+            </div>
+          )}
+          {/* ================= CHART ================= */}
+          {goalData && (
+            <div className="bg-white p-6 rounded-2xl shadow-md mb-8">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    Weekly Activity
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    Distance trend (Mon - Sun)
+                  </p>
+                </div>
+              </div>
+
+              {/* Chart */}
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={getChartData()}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+
+                  <XAxis
+                    dataKey="day"
+                    stroke="#6b7280"
+                    tick={{ fontSize: 12 }}
+                  />
+
+                  <YAxis stroke="#6b7280" tick={{ fontSize: 12 }} />
+
+                  <Tooltip content={<CustomTooltip />} />
+
+                  <Line
+                    type="monotone"
+                    dataKey="distance"
+                    stroke="#6366f1"
+                    strokeWidth={3}
+                    dot={{ r: 4 }}
+                    activeDot={{ r: 6 }}
+                    animationDuration={800}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+          {/* ================= GOAL ================= */}
+          {goalData ? (
+            <div className="bg-white p-6 rounded-2xl shadow-md mb-8">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-gray-800">
+                  Weekly Goal
+                </h2>
+
+                <span className="text-sm text-gray-500">
+                  {Math.round(goalData.progress)}%
+                </span>
+              </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-3 gap-4 mb-4 text-center">
+                <div>
+                  <p className="text-sm text-gray-500">Target</p>
+                  <p className="font-semibold text-gray-800">
+                    {goalData.goal.targetDistance} km
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-500">Completed</p>
+                  <p className="font-semibold text-green-600">
+                    {goalData.totalDistance.toFixed(1)} km
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-500">Remaining</p>
+                  <p className="font-semibold text-blue-600">
+                    {Math.max(
+                      goalData.goal.targetDistance - goalData.totalDistance,
+                      0,
+                    ).toFixed(1)}{" "}
+                    km
+                  </p>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div
+                  className="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full transition-all"
+                  style={{ width: `${goalData.progress}%` }}
+                ></div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white p-6 rounded-2xl shadow-md mb-8">
+              <h2 className="text-lg font-semibold mb-4">Set Weekly Goal</h2>
+
+              <form onSubmit={handleSetGoal} className="flex gap-4">
+                <input
+                  type="number"
+                  min="1"
+                  placeholder="Target Distance (km)"
+                  value={targetDistance}
+                  onChange={(e) => setTargetDistance(e.target.value)}
+                  className="border p-2 rounded w-full"
+                  required
+                />
+
+                <button className="bg-green-600 text-white px-4 rounded hover:bg-green-700">
+                  Set
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* ================= ADD WORKOUT ================= */}
+          <div className="bg-white p-6 rounded-xl shadow mb-8">
+            <h2 className="text-lg font-semibold mb-4">Add Workout</h2>
+
+            <form
+              onSubmit={handleAddWorkout}
+              className="grid md:grid-cols-5 gap-4"
+            >
               <input
                 type="date"
                 max={new Date().toISOString().split("T")[0]}
-                value={editDate}
-                onChange={(e) => setEditDate(e.target.value)}
-                className="border p-2 rounded w-full"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="border p-2 rounded"
                 required
               />
               <input
                 type="number"
                 step="0.1"
                 min="0.1"
-                value={editDistance}
-                onChange={(e) => setEditDistance(e.target.value)}
-                className="border p-2 rounded w-full"
+                placeholder="Distance (km)"
+                value={distance}
+                onChange={(e) => setDistance(e.target.value)}
+                className="border p-2 rounded"
                 required
               />
               <input
                 type="number"
                 min="1"
-                value={editDuration}
-                onChange={(e) => setEditDuration(e.target.value)}
-                className="border p-2 rounded w-full"
+                placeholder="Duration (mins)"
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                className="border p-2 rounded"
                 required
               />
               <select
-                value={editIntensity}
-                onChange={(e) => setEditIntensity(e.target.value)}
-                className="border p-2 rounded w-full"
+                value={intensity}
+                onChange={(e) => setIntensity(e.target.value)}
+                className="border p-2 rounded"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
               </select>
-
-              <div className="flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsEditOpen(false)}
-                  className="px-4 py-2 bg-gray-300 rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  Update
-                </button>
-              </div>
+              <button className="bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                Add
+              </button>
             </form>
           </div>
+
+          {/* ================= WORKOUT LIST ================= */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {workouts.map((workout) => (
+              <div
+                key={workout._id}
+                className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition"
+              >
+                
+                <p className="text-sm text-gray-500 mb-3">
+                  {new Date(workout.date).toLocaleDateString()}
+                </p>
+
+                <p className="text-xl font-bold text-gray-800 mb-2">
+                  {workout.distance} km
+                </p>
+                  {/* Details */}
+                  <div className="text-sm text-gray-600 space-y-1 mb-4">
+                    <p>⏱ {formatDuration(workout.duration)}</p>
+                    <p>⚡ Pace: {formatPace(calculateWorkoutPace(workout.distance, workout.duration))}</p>
+                    <p>🔥 {Math.round(workout.calories).toLocaleString()} kcal</p>
+                    <p>Intensity: {workout.intensity}</p>
+                  </div>
+              
+                <div className=" flex gap-3">
+                  <button
+                    onClick={() => handleEditClick(workout)}
+                    className="flex-1 bg-yellow-400 text-white py-1 rounded hover:bg-yellow-500 transition"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(workout._id)}
+                    className="flex-1 bg-red-500 text-white py-1 rounded hover:bg-red-600 transition"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      )}
+
+        {/* ================= EDIT MODAL ================= */}
+        {isEditOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl shadow-xl w-96">
+              <h2 className="text-lg font-semibold mb-4">Edit Workout</h2>
+
+              <form onSubmit={handleUpdateWorkout} className="space-y-4">
+                <input
+                  type="date"
+                  max={new Date().toISOString().split("T")[0]}
+                  value={editDate}
+                  onChange={(e) => setEditDate(e.target.value)}
+                  className="border p-2 rounded w-full"
+                  required
+                />
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0.1"
+                  value={editDistance}
+                  onChange={(e) => setEditDistance(e.target.value)}
+                  className="border p-2 rounded w-full"
+                  required
+                />
+                <input
+                  type="number"
+                  min="1"
+                  value={editDuration}
+                  onChange={(e) => setEditDuration(e.target.value)}
+                  className="border p-2 rounded w-full"
+                  required
+                />
+                <select
+                  value={editIntensity}
+                  onChange={(e) => setEditIntensity(e.target.value)}
+                  className="border p-2 rounded w-full"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+
+                <div className="flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditOpen(false)}
+                    className="px-4 py-2 bg-gray-300 rounded"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Update
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
+
 }
 
 export default Dashboard;
